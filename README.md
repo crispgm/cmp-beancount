@@ -7,10 +7,12 @@ I use this because the language server of beancount has not been ready yet.
 
 ## Setup
 
+Clone the repo, and use packer.nvim to load locally.
+
 Generate items at first:
 
 ```bash
-./gen_account.py /path/to/account.bean
+./gen_account.py /path/to/account.bean > lua/cmp_bean_account/items.lua
 ```
 
 Then, edit your nvim config:
