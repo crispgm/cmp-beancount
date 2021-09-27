@@ -9,6 +9,10 @@ I use this because the language server of beancount has not been ready yet.
 
 Clone the repo, and use packer.nvim to load locally.
 
+```lua
+use('/path/to/cmp-bean-account')
+```
+
 Generate items at first:
 
 ```bash

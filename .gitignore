@@ -39,3 +39,4 @@ luac.out
 *.x86_64
 *.hex
 
+lua/cmp_bean_account/items.lua
