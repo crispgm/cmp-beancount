@@ -10,6 +10,10 @@ source.get_trigger_characters = function()
     return { 'Ex', 'In', 'As', 'Li', 'Eq' }
 end
 
+local ltrim = function(s)
+    return s:match('^%s*(.*)')
+end
+
 source.complete = function(self, request, callback)
     if vim.bo.filetype ~= 'beancount' then
         callback()
@@ -22,7 +26,12 @@ source.complete = function(self, request, callback)
     local items = {}
     local count = 0
     for _, item in ipairs(self.items) do
-        if vim.startswith(item.label, request.context.cursor_before_line) then
+        if
+            vim.startswith(
+                item.label:lower(),
+                ltrim(request.context.cursor_before_line):lower()
+            )
+        then
             table.insert(items, item)
             count = count + 1
         end
