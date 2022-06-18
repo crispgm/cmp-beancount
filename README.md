@@ -4,13 +4,16 @@ nvim-cmp source for beancount accounts.
 
 ## Setup
 
-Clone the repo, and use packer.nvim to load locally.
+Prerequisites:
+
+- Python3
+- Beancount
 
 ```lua
 use('crispgm/cmp-beancount')
 ```
 
-Then, edit your nvim config:
+Then, add to completion source:
 
 ```lua
 require('cmp').setup {
