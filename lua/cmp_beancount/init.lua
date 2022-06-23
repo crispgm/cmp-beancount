@@ -30,9 +30,10 @@ local get_items = function(account_path)
         string.format(
             [[python3 <<EOB
 from beancount.loader import load_file
-f = load_file('%s')
-for item in f[0]:
-    print(item.account)
+entries, _, _ = load_file('%s')
+accounts = {t.account for t in entries if hasattr(t, 'account')}
+for account in accounts:
+    print(account)
 EOB]],
             account_path
         ),
