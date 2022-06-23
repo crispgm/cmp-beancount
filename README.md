@@ -4,19 +4,23 @@ nvim-cmp source for beancount accounts.
 
 cmp-beancount completes based on prefix and prefix abbreviation (e.g. `E:A:E` to `Expenses:Accessories:Electronics`) of beancount account names.
 
+![](./screenshot.png)
+
 ## Setup
 
 Prerequisites:
 
-- Python3
-- Beancount
+```shell
+pip3 install neovim
+pip3 install beancount
+```
 
 Install with your favorite package manager:
 ```lua
 use('crispgm/cmp-beancount')
 ```
 
-Then, add to completion source:
+Then, setup completion source:
 ```lua
 require('cmp').setup {
   sources = {
@@ -29,3 +33,7 @@ require('cmp').setup {
   }
 }
 ```
+
+## License
+
+MIT
