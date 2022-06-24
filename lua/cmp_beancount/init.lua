@@ -26,21 +26,26 @@ local ltrim = function(s)
 end
 
 local get_items = function(account_path)
-    local output = vim.api.nvim_exec(
+    -- improved version is based on https://github.com/nathangrigg/vim-beancount/blob/master/autoload/beancount.vim
+    vim.api.nvim_exec(
         string.format(
             [[python3 <<EOB
 from beancount.loader import load_file
+from beancount.core import data
+
+accounts = set()
 entries, _, _ = load_file('%s')
-accounts = {t.account for t in entries if hasattr(t, 'account')}
-for account in accounts:
-    print(account)
+for index, entry in enumerate(entries):
+    if isinstance(entry, data.Open):
+        accounts.add(entry.account)
+vim.command('let b:beancount_accounts = [{}]'.format(','.join(repr(x) for x in sorted(accounts))))
 EOB]],
             account_path
         ),
         true
     )
     local items = {}
-    for s in output:gmatch('[^\r\n]+') do
+    for _, s in ipairs(vim.b.beancount_accounts) do
         table.insert(items, {
             label = s,
             kind = cmp.lsp.CompletionItemKind.Property,
