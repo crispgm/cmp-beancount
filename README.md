@@ -4,7 +4,9 @@ nvim-cmp source for beancount accounts.
 
 cmp-beancount completes based on prefix and prefix abbreviation (e.g. `E:A:E` to `Expenses:Accessories:Electronics`) of beancount account names.
 
-![](./screenshot.png)
+![Completion](./screenshots/completion.png)
+
+![Abbreviation](./screenshots/abbreviation.png)
 
 ## Setup
 
