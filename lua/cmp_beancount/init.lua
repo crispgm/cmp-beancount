@@ -98,7 +98,25 @@ source.complete = function(self, request, callback)
     for _, item in ipairs(self.items) do
         if prefix_mode then
             if string.match(item.label:lower(), pattern) then
-                table.insert(items, item)
+                table.insert(items, {
+                    word = item.label,
+                    label = item.label,
+                    kind = item.kind,
+                    textEdit = {
+                        filterText = input,
+                        newText = item.label,
+                        range = {
+                            start = {
+                                line = request.context.cursor.row - 1,
+                                character = request.offset - string.len(input),
+                            },
+                            ['end'] = {
+                                line = request.context.cursor.row - 1,
+                                character = request.context.cursor.col - 1,
+                            },
+                        },
+                    },
+                })
                 count = count + 1
             end
         else
