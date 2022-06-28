@@ -99,7 +99,6 @@ source.complete = function(self, request, callback)
     end
 
     local items = {}
-    local count = 0
     for _, item in ipairs(self.items) do
         if prefix_mode then
             if string.match(item.label:lower(), pattern) then
@@ -122,16 +121,11 @@ source.complete = function(self, request, callback)
                         },
                     },
                 })
-                count = count + 1
             end
         else
             if vim.startswith(item.label:lower(), input) then
                 table.insert(items, item)
-                count = count + 1
             end
-        end
-        if count >= 10 then
-            break
         end
     end
     callback(items)
