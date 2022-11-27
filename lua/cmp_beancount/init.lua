@@ -89,9 +89,9 @@ source.complete = function(self, request, callback)
 
     for i, prefix in ipairs(prefixes) do
         if i == 1 then
-            pattern = string.format('%s%%a*', prefix:lower())
+            pattern = string.format('%s[%%w%%-]*', prefix:lower())
         else
-            pattern = string.format('%s:%s%%a*', pattern, prefix:lower())
+            pattern = string.format('%s:%s[%%w%%-]*', pattern, prefix:lower())
         end
     end
     if #prefixes > 1 and pattern ~= '' then
