@@ -56,9 +56,8 @@ EOB]],
 end
 
 local split_accounts = function(str)
-    local sep = ':'
     local t = {}
-    for s in string.gmatch(str, '([^' .. sep .. ']+)') do
+    for s in string.gmatch(str, '([^:]+)') do
         table.insert(t, s)
     end
     return t
