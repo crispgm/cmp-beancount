@@ -24,7 +24,7 @@ source.get_trigger_characters = function()
 end
 
 local ltrim = function(s)
-    return s:match("%s*(%S+)%s*$")
+    return s:match('%s*(%S+)%s*$')
 end
 
 local get_items = function(account_path)
@@ -44,7 +44,7 @@ vim.command('let b:beancount_links = [{}]'.format(','.join(sorted(links))))
 EOB]],
             account_path
         ),
-        {output=true}
+        { output = true }
     )
 
     local items = {}
@@ -60,7 +60,7 @@ EOB]],
     items.tags = {}
     for _, s in ipairs(vim.b.beancount_tags) do
         table.insert(items.tags, {
-            label = "#" .. s,
+            label = '#' .. s,
             kind = cmp.lsp.CompletionItemKind.Property,
         })
     end
@@ -68,7 +68,7 @@ EOB]],
     items.links = {}
     for _, s in ipairs(vim.b.beancount_links) do
         table.insert(items.links, {
-            label = "^" .. s,
+            label = '^' .. s,
             kind = cmp.lsp.CompletionItemKind.Reference,
         })
     end
@@ -108,7 +108,7 @@ source.complete = function(self, request, callback)
 
     local input = ltrim(request.context.cursor_before_line):lower()
 
-    if string.match(input, "^#") then
+    if string.match(input, '^#') then
         for _, tag in ipairs(self.items.tags) do
             if vim.startswith(tag.label:lower(), input) then
                 table.insert(items, tag)
@@ -118,7 +118,7 @@ source.complete = function(self, request, callback)
         return callback(items)
     end
 
-    if string.match(input, "^%^") then
+    if string.match(input, '^%^') then
         for _, link in ipairs(self.items.links) do
             if vim.startswith(link.label:lower(), input) then
                 table.insert(items, link)
