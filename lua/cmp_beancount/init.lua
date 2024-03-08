@@ -22,7 +22,7 @@ source.get_trigger_characters = function()
 end
 
 local ltrim = function(s)
-    return s:match('^%s*(.*)')
+    return s:match("%s*(%S+)%s*$")
 end
 
 local get_items = function(account_path)
