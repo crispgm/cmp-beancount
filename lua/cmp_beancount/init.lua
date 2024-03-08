@@ -27,7 +27,7 @@ end
 
 local get_items = function(account_path)
     -- improved version is based on https://github.com/nathangrigg/vim-beancount/blob/master/autoload/beancount.vim
-    vim.api.nvim_exec(
+    vim.api.nvim_exec2(
         string.format(
             [[python3 <<EOB
 from beancount.loader import load_file
@@ -42,7 +42,7 @@ vim.command('let b:beancount_accounts = [{}]'.format(','.join(repr(x) for x in s
 EOB]],
             account_path
         ),
-        true
+        {output=true}
     )
     local items = {}
     for _, s in ipairs(vim.b.beancount_accounts) do
