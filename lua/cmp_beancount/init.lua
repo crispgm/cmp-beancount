@@ -38,9 +38,10 @@ entries, _, _ = load_file('%s')
 accounts = getters.get_accounts(entries)
 links = getters.get_all_links(entries)
 tags = getters.get_all_tags(entries)
-vim.command('let b:beancount_accounts = [{}]'.format(','.join(sorted(accounts))))
-vim.command('let b:beancount_tags = [{}]'.format(','.join(sorted(tags))))
-vim.command('let b:beancount_links = [{}]'.format(','.join(sorted(links))))
+f = lambda l: ','.join(f'"{s}"' for s in sorted(l))
+vim.command('let b:beancount_accounts = [{}]'.format(f(accounts)))
+vim.command('let b:beancount_tags = [{}]'.format(f(tags)))
+vim.command('let b:beancount_links = [{}]'.format(f(links)))
 EOB]],
             account_path
         ),
