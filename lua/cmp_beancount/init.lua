@@ -54,7 +54,7 @@ EOB]],
     for _, s in ipairs(vim.b.beancount_accounts) do
         table.insert(items.accounts, {
             label = s,
-            kind = cmp.lsp.CompletionItemKind.Interface,
+            kind = cmp.lsp.CompletionItemKind.Property,
         })
     end
 
@@ -70,7 +70,7 @@ EOB]],
     for _, s in ipairs(vim.b.beancount_links) do
         table.insert(items.links, {
             label = '^' .. s,
-            kind = cmp.lsp.CompletionItemKind.Reference,
+            kind = cmp.lsp.CompletionItemKind.Property,
         })
     end
 
