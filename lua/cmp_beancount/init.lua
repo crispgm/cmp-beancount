@@ -18,36 +18,58 @@ source.get_trigger_characters = function()
         'I:',
         'A:',
         'L:',
+        '#',
+        '^',
     }
 end
 
 local ltrim = function(s)
-    return s:match('^%s*(.*)')
+    return s:match('%s*(%S+)%s*$')
 end
 
 local get_items = function(account_path)
-    -- improved version is based on https://github.com/nathangrigg/vim-beancount/blob/master/autoload/beancount.vim
-    vim.api.nvim_exec(
+    vim.api.nvim_exec2(
         string.format(
             [[python3 <<EOB
 from beancount.loader import load_file
-from beancount.core import data
+from beancount.core import getters
 
-accounts = set()
 entries, _, _ = load_file('%s')
-for index, entry in enumerate(entries):
-    if isinstance(entry, data.Open):
-        accounts.add(entry.account)
-vim.command('let b:beancount_accounts = [{}]'.format(','.join(repr(x) for x in sorted(accounts))))
+accounts = getters.get_accounts(entries)
+links = getters.get_all_links(entries)
+tags = getters.get_all_tags(entries)
+f = lambda l: ','.join(f'"{s}"' for s in sorted(l))
+vim.command('let b:beancount_accounts = [{}]'.format(f(accounts)))
+vim.command('let b:beancount_tags = [{}]'.format(f(tags)))
+vim.command('let b:beancount_links = [{}]'.format(f(links)))
 EOB]],
             account_path
         ),
-        true
+        { output = true }
     )
+
     local items = {}
+
+    items.accounts = {}
     for _, s in ipairs(vim.b.beancount_accounts) do
-        table.insert(items, {
+        table.insert(items.accounts, {
             label = s,
+            kind = cmp.lsp.CompletionItemKind.Property,
+        })
+    end
+
+    items.tags = {}
+    for _, s in ipairs(vim.b.beancount_tags) do
+        table.insert(items.tags, {
+            label = '#' .. s,
+            kind = cmp.lsp.CompletionItemKind.Property,
+        })
+    end
+
+    items.links = {}
+    for _, s in ipairs(vim.b.beancount_links) do
+        table.insert(items.links, {
+            label = '^' .. s,
             kind = cmp.lsp.CompletionItemKind.Property,
         })
     end
@@ -56,9 +78,8 @@ EOB]],
 end
 
 local split_accounts = function(str)
-    local sep = ':'
     local t = {}
-    for s in string.gmatch(str, '([^' .. sep .. ']+)') do
+    for s in string.gmatch(str, '([^:]+)') do
         table.insert(t, s)
     end
     return t
@@ -69,6 +90,7 @@ source.complete = function(self, request, callback)
         callback()
         return
     end
+
     local account_path = request.option.account
     if account_path == nil or not vim.fn.filereadable(account_path) then
         vim.api.nvim_echo({
@@ -78,14 +100,38 @@ source.complete = function(self, request, callback)
         callback()
         return
     end
+
     if not self.items then
         self.items = get_items(request.option.account)
     end
 
-    local prefix_mode = false
+    local items = {}
+
     local input = ltrim(request.context.cursor_before_line):lower()
-    local prefixes = split_accounts(input)
+
+    if string.match(input, '^#') then
+        for _, tag in ipairs(self.items.tags) do
+            if vim.startswith(tag.label:lower(), input) then
+                table.insert(items, tag)
+            end
+        end
+
+        return callback(items)
+    end
+
+    if string.match(input, '^%^') then
+        for _, link in ipairs(self.items.links) do
+            if vim.startswith(link.label:lower(), input) then
+                table.insert(items, link)
+            end
+        end
+
+        return callback(items)
+    end
+
+    local prefix_mode = false
     local pattern = ''
+    local prefixes = split_accounts(input)
 
     for i, prefix in ipairs(prefixes) do
         if i == 1 then
@@ -98,17 +144,16 @@ source.complete = function(self, request, callback)
         prefix_mode = true
     end
 
-    local items = {}
-    for _, item in ipairs(self.items) do
+    for _, account in ipairs(self.items.accounts) do
         if prefix_mode then
-            if string.match(item.label:lower(), pattern) then
+            if string.match(account.label:lower(), pattern) then
                 table.insert(items, {
-                    word = item.label,
-                    label = item.label,
-                    kind = item.kind,
+                    word = account.label,
+                    label = account.label,
+                    kind = account.kind,
                     textEdit = {
                         filterText = input,
-                        newText = item.label,
+                        newText = account.label,
                         range = {
                             start = {
                                 line = request.context.cursor.row - 1,
@@ -123,11 +168,12 @@ source.complete = function(self, request, callback)
                 })
             end
         else
-            if vim.startswith(item.label:lower(), input) then
-                table.insert(items, item)
+            if vim.startswith(account.label:lower(), input) then
+                table.insert(items, account)
             end
         end
     end
+
     callback(items)
 end
 
