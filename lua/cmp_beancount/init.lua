@@ -35,7 +35,7 @@ from beancount.loader import load_file
 from beancount.core import getters
 
 entries, _, _ = load_file('%s')
-accounts = getters.get_accounts(entries)
+accounts = (k for k, v in getters.get_account_open_close(entries).items() if v[1] is None)
 links = getters.get_all_links(entries)
 tags = getters.get_all_tags(entries)
 f = lambda l: ','.join(f'"{s}"' for s in sorted(l))
