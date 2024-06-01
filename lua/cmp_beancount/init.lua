@@ -93,16 +93,11 @@ source.complete = function(self, request, callback)
 
     local account_path = request.option.account
     if account_path == nil or not vim.fn.filereadable(account_path) then
-        vim.api.nvim_echo({
-            { 'cmp_beancount', 'ErrorMsg' },
-            { ' ' .. 'Accounts file is not set' },
-        }, true, {})
-        callback()
-        return
+        account_path = vim.api.nvim_buf_get_name(0)
     end
 
     if not self.items then
-        self.items = get_items(request.option.account)
+        self.items = get_items(account_path)
     end
 
     local items = {}
