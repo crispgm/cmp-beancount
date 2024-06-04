@@ -97,31 +97,36 @@ source.complete = function(self, request, callback)
     end
 
     if not self.items then
-        self.items = get_items(account_path)
+        self.items = {}
     end
 
-    local items = {}
+    if not self.items[account_path] then
+        self.items[account_path] = get_items(account_path)
+    end
+
+    local items = self.items[account_path]
+    local callback_items = {}
 
     local input = ltrim(request.context.cursor_before_line):lower()
 
     if string.match(input, '^#') then
-        for _, tag in ipairs(self.items.tags) do
+        for _, tag in ipairs(items.tags) do
             if vim.startswith(tag.label:lower(), input) then
-                table.insert(items, tag)
+                table.insert(callback_items, tag)
             end
         end
 
-        return callback(items)
+        return callback(callback_items)
     end
 
     if string.match(input, '^%^') then
-        for _, link in ipairs(self.items.links) do
+        for _, link in ipairs(items.links) do
             if vim.startswith(link.label:lower(), input) then
-                table.insert(items, link)
+                table.insert(callback_items, link)
             end
         end
 
-        return callback(items)
+        return callback(callback_items)
     end
 
     local prefix_mode = false
@@ -139,10 +144,10 @@ source.complete = function(self, request, callback)
         prefix_mode = true
     end
 
-    for _, account in ipairs(self.items.accounts) do
+    for _, account in ipairs(items.accounts) do
         if prefix_mode then
             if string.match(account.label:lower(), pattern) then
-                table.insert(items, {
+                table.insert(callback_items, {
                     word = account.label,
                     label = account.label,
                     kind = account.kind,
@@ -164,12 +169,12 @@ source.complete = function(self, request, callback)
             end
         else
             if vim.startswith(account.label:lower(), input) then
-                table.insert(items, account)
+                table.insert(callback_items, account)
             end
         end
     end
 
-    callback(items)
+    callback(callback_items)
 end
 
 return source
