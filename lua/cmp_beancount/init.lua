@@ -157,7 +157,7 @@ source.complete = function(self, request, callback)
                         range = {
                             start = {
                                 line = request.context.cursor.row - 1,
-                                character = request.offset - string.len(input),
+                                character = request.context.cursor.col - 1 - string.len(input),
                             },
                             ['end'] = {
                                 line = request.context.cursor.row - 1,
